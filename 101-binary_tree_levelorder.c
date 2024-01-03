@@ -2,19 +2,46 @@
 #include <stdio.h>
 #include "binary_trees.h"
 
-/**
- * binary_tree_is_perfect - checks if a binary tree is perfect
- * @tree: pointer to the root node of the tree to traverse
- *
- * Return: 1 if tree is perfect, 0 if tree is NULL or not perfect
- */
-int binary_tree_is_perfect(const binary_tree_t *tree)
-{
-size_t nodes, height;
 
-if (!tree)
-return (0);
-nodes = binary_tree_nodes(tree);
-height = binary_tree_height(tree);
-return (nodes == (2 << height) -1);
+void binary_tree_levelorder(const binary_tree_t *tree, void (*func)(int))
+{
+binary_tree_t **queue, *node;
+size_t front = 0, back = 0, size = 1;
+
+if (!tree || !func)
+return;
+queue = malloc(sizeof(*queue) * size);
+if (!queue)
+return;
+queue[back] = (binary_tree_t *)tree;
+while (size)
+{
+node = queue[front];
+func(node->n);
+if (node->left)
+{
+if (size == back + 1)
+{
+size <<= 1;
+queue = realloc(queue, sizeof(*queue) * size);
+if (!queue)
+return;
+}
+queue[++back] = node->left;
+}
+if (node->right)
+{
+if (size == back + 1)
+{
+size <<= 1;
+queue = realloc(queue, sizeof(*queue) * size);
+if (!queue)
+return;
+}
+queue[++back] = node->right;
+}
+front++;
+size--;
+}
+free(queue);
 }
